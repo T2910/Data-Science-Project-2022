@@ -65,7 +65,7 @@ def store_classifier(classifier, filename):
 
 def training():
     # Load data
-    DATA_ALL = pd.read_csv("ALL_CLEAN.csv")
+    DATA_ALL = pd.read_csv("clean_important.csv")
 
     # Divide data into Train/Test set
     Y_ALL = DATA_ALL["category"]
@@ -135,9 +135,7 @@ def training():
 
 
 def predict(data):
-    print("predict")
-    y = data["category"]
-    data = data.drop(["category"], axis=1)
+    data = data.drop('category', axis=1)
     filenames = ['models/model_gbc.sav', "models/model_dtc.sav", "models/model_bag.sav", "models/model_rfc.sav", "models/model_ada.sav", "models/model_knn.sav", "models/model_lrc.sav"]
     classifiers = [pickle.load(open(file, 'rb')) for file in filenames]
 
@@ -153,24 +151,10 @@ def predict(data):
 
     return majority_vote
 
-    # Check accuracy
-    # n_correct_classifications = 0
-    # expected = y.to_numpy()
-    # for i in range(len(predictions)):
-    #     if (majority_vote[i]==expected[i]):
-    #         n_correct_classifications += 1
-    #
-    # acc = n_correct_classifications/len(predictions)
-    #
-    # print(f"Accuracy on test set: {acc}\n")
-    #
-    # print("\n----------------------------------------\n\n")
-
-
 
 def main(args):
     # Set seed
-    random.seed(42)
+    random.seed(43)
 
     # Training
     if (args.train):
@@ -189,7 +173,7 @@ def main(args):
         predictions = predictions.replace(2.0, 'Severe Depression')
 
         data = pd.concat([data, predictions], axis=1)
-        data.to_csv(args.data + '_with_prediction.csv')
+        data.to_csv(args.out)
 
 
     return 0
@@ -200,6 +184,7 @@ if __name__ == "__main__":
     parser.add_argument('--train', default=False, action='store_true', help='Whether to train the models using the existing data.')
     parser.add_argument('--predict', default=False, action='store_true', help='Whether to predict the depression for new data. New data must be provided with the "--data" flag. For this, the trained models must exist, so training has to be done before.')
     parser.add_argument('--data', default=None, help='The path of the .csv file to use for predicting the depression. It is assumed that this already has the same columns as the existing data that was used to train the models.')
+    parser.add_argument('--out', default='out.csv', help='The path of the output file.')
 
     args = parser.parse_args()
 
