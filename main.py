@@ -135,7 +135,6 @@ def training():
 
 
 def predict(data):
-    data = data.drop('category', axis=1)
     filenames = ['models/model_gbc.sav', "models/model_dtc.sav", "models/model_bag.sav", "models/model_rfc.sav", "models/model_ada.sav", "models/model_knn.sav", "models/model_lrc.sav"]
     classifiers = [pickle.load(open(file, 'rb')) for file in filenames]
 
