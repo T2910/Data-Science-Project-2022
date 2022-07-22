@@ -12,6 +12,7 @@ from sklearn.cluster import KMeans
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import GaussianNB
 
 
 
@@ -63,7 +64,10 @@ def store_classifier(classifier, filename):
     file.close()
 
 
-def training():
+# ------------------------------------------------------------------------ #
+# Train classifiers using training and test set
+# ------------------------------------------------------------------------ #
+def train():
     # Load data
     DATA_ALL = pd.read_csv("clean_important.csv")
 
@@ -73,22 +77,17 @@ def training():
     X_train, Y_train, X_test, Y_test = split_train_test(X_ALL, Y_ALL, 0.2)
 
 
-
-    # ------------------------------------------------------------------------ #
-    # Train classifiers using training and test set
-    # ------------------------------------------------------------------------ #
-
     # Gradient Boost
     print("Gradient Boosting Classifier\n")
     classifier = GradientBoostingClassifier(n_estimators=25, learning_rate=0.1, max_features=10, max_depth=10)
     classifier = train_classifier(classifier, X_train, Y_train, X_test, Y_test)
     store_classifier(classifier, "models/model_gbc.sav")
 
-    # Decision Tree
-    print("Decision Tree Classifier\n")
-    classifier = DecisionTreeClassifier(max_depth=2)
-    classifier = train_classifier(classifier, X_train, Y_train, X_test, Y_test)
-    store_classifier(classifier, "models/model_dtc.sav")
+    # Decision Tree (not used)
+    # print("Decision Tree Classifier\n")
+    # classifier = DecisionTreeClassifier(max_depth=2)
+    # classifier = train_classifier(classifier, X_train, Y_train, X_test, Y_test)
+    # store_classifier(classifier, "models/model_dtc.sav")
 
     # Bagging Ensemble
     print("Bagging Ensemble\n")
@@ -132,8 +131,16 @@ def training():
     classifier = train_classifier(classifier, X_train, Y_train, X_test, Y_test)
     store_classifier(classifier, "models/model_lrc.sav")
 
+    # Gaussian Naive Bayes
+    print("Gaussian Naive Bayes\n")
+    classifier = GaussianNB()
+    classifier = train_classifier(classifier, X_train, Y_train, X_test, Y_test)
+    store_classifier(classifier, "models/model_gnb.sav")
 
 
+# ------------------------------------------------------------------------ #
+# Predict depression for given data
+# ------------------------------------------------------------------------ #
 def predict(data):
     filenames = ['models/model_gbc.sav', "models/model_dtc.sav", "models/model_bag.sav", "models/model_rfc.sav", "models/model_ada.sav", "models/model_knn.sav", "models/model_lrc.sav"]
     classifiers = [pickle.load(open(file, 'rb')) for file in filenames]
@@ -157,7 +164,7 @@ def main(args):
 
     # Training
     if (args.train):
-        training()
+        train()
 
     # Prediction
     if (args.predict):
